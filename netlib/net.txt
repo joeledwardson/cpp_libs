@@ -1,0 +1,59 @@
+
+		packet structure protocol 
+_______________________________________
+***************************************
+
+
+*requests = attempting to initiate a connection
+*comms = once a connection is established comms = communications
+
+The following are core packets, that means the indexing of byes given are the first bytes in the packet in the core.
+IMPORTANT: The core is always of size CM_BYTE_START even if some of the core is unused bytes.
+User data ALWAYS starts after the core
+
+		Quit packet
+___________________________________
+byte_CM = CM_QUIT
+
+		Heartbeat packets
+____________________________________
+byte_CM = CM_HEARTBEAT
+byte_PN = packet number (increments each packet)
+
+
+
+
+		Update packets
+___________________________________
+----------sending-----------------
+byte_CM = CM_UPDATE_SND
+byte_UP	= update ID (increments each packet, and is independant for each contact)
+byte_UT = update type (not defined in this library, for user to define)
+end core:
+byte_START = user data: this is the main protocol for sending data to clients and is where all user data goes
+
+
+---------recieveing----------------
+byte_CM = CM_UPDATE_SND
+byte_UP = ID of update that has been receieved (this is a conformation packet)
+
+
+
+
+		Requests
+____________________________________
+byte_CM = CM_NORMREQUEST
+byte_RQID = ID of request (to differ user requests apart if multiple requests are sent in quick succession)
+byte_RQHB = current heartbeat of user
+end core:
+byte_START: user data, can be user to send different forms of request
+
+---reply---
+byte_CM = CM_REPLY_SUCCESS
+byte_RQID = ID of request sent originally
+*success:
+byte_RQHB = heartbeat of receiever
+end core:
+byte_START = user data: can be used to initiate connection for whatever purpose
+*fail
+byte_RQDR = reason of deny to request

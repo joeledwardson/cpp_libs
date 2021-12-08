@@ -1,0 +1,55 @@
+
+		packet structure protocol 
+_______________________________________
+***************************************
+
+
+*requests = attempting to initiate a connection
+*comms = once a connection is established comms = communications
+start byte = 4
+
+		Heartbeat packets
+____________________________________
+no of bytes: 2
+0: CM = CM_HEARTBEAT
+1: packet ID
+
+
+
+
+
+		Update packets
+___________________________________
+----------sending-----------------
+0: CM = CM_UPDATE_SND
+1: update ID
+2: update type
+
+---------recieveing----------------
+0: CM = CM_UPDATE_RCV
+1: update ID
+
+
+
+
+		Requests
+____________________________________
+0: CM = CM_NORMREQUEST
+1: request id
+2: current heartbeat ID 
+
+0: CM = CM_REPLY_SUCCESS / CM_REPLY_FAIL success or failure (this can be expanded upon)
+1: request id
+//failure
+2: deny reason //no default definitions created. User must create these
+//success
+2: current heartbeat ID
+
+
+
+
+
+**IMPORTANT - ALL PACKET must be formed AFTER these core bytes - starting at BNP::byte_START
+
+
+

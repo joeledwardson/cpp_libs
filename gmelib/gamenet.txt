@@ -1,0 +1,139 @@
+	
+	Packet structure protocol 
+_______________________________________
+***************************************
+
+IMPORTANT: all data listed here is USER DATA - that means it comes AFTER the packet core at index byte_START,
+sett lib/netlib/*.txt for details
+
+*N.B bool is actually uint8_t, set to 0 or 1
+
+*N.B for information about the types/structures gameint/Game/ChatPacket etc.. see GameNet.h, GNP namespace,
+
+Document format:
+[type]
+{} braces indicate array of predetermined size
+
+
+
+
+	Requests
+____________________________
+send:
+[string] player name
+
+receieve:
+*success
+	[gameint] number of servers
+	{[Game]} Server List
+*fail
+	[byte] deny reason
+
+
+	Updates
+____________________________
+
+*
+ADD_PLAYER: (state=LOBBY)
+server->client
+	[string] new player name
+
+
+*
+RMV_PLYR_KICK (state=LOBBY)
+client->server
+	[gameint] player index
+
+*
+RMV_PLYR_DEF (
+server->client
+	[gameint] player index
+
+
+*
+COUNTDOWN_SYNC (state=COUNTDOWN)
+server->client
+	[byte] number of seconds elapsed (mili seconds elapsed=0)
+
+
+*
+LEAVE_GAME (state=PLAYING or COUNTDOWN)
+client->server
+	*empty*
+server->client
+	[gameint] number of servers
+	{[Game]} server List
+
+
+*
+PROMOTE (state=LOBBY)
+client->server
+	[gameint] player index for promotion to Game
+server->client
+	[bool] if true-packet is promotion to Game packet, if false-packet is demotion to regular non-Game game client
+
+
+*
+CHAT_XTND (state=LOBBY or SERVELIST)
+client->server
+	[string] chat message contents
+server->client
+	[ChatPacket] message to append to chat
+
+
+*
+ADD_SVR (state=SERVERLIST)
+server->client
+	[gameint] new number of servers
+	[Game] structure of Game to add
+
+
+*
+RM_SVR (state=SERVERLIST)
+server->client
+	[gameint] new number of servers
+	[Game] structure of Game to add
+
+*
+SVR_UPDATE (state=SERVERLIST)
+server->client
+	[gameint] index of server to update
+	[Game] game server data updated
+
+
+*
+JOIN_GAME (state=SERVERLIST)
+client->server
+	[gameint] index of server to join
+server->client 
+	[bool] result (succeeded in joining game or not)
+	*success
+	[Game]
+	{[string]} list of player names
+	*failure
+	[byte] deny reason
+
+
+*
+HOST_GAME (state=SERVERLIST)
+client->server
+	*empty*
+server->client
+	(see server->client for JOIN_GAME)
+
+
+*
+CHANGE_STATE:
+client->server
+	[Gamestate] new game server state
+server->client
+	New State
+	COUNTDOWN:
+		*empty*
+	LOBBY:
+		[Game]
+		{[string]} list of player names
+	SERVERLIST:
+		[gameint] number of servers
+		{[Game]} server List
+	
